@@ -19,7 +19,9 @@ class titration():
     Class representing a Winkler titration of a single sample (or std)
     """
     root_dir = os.path.join(os.path.expanduser('~'),'winkler-titrator-hakai')
+
     def __init__(self,meter,pump,botid,vbot,type,Mthios,thio_t,datadir=os.path.join(root_dir,'data'),mode='normal'):
+
         """
         Initialize titration
         INPUTS:
@@ -48,10 +50,10 @@ class titration():
         #self.pump.setPos(0)
         self.vbot = vbot
         # when True there are no actual pumping or meter reads
-        self.DEBUG = True
+        self.DEBUG = False
         # when True the meter makes a reading (e.g. in DI water) but dummy_read
         # is called and mock data returned
-        self.dummy_meter = True
+        self.dummy_meter = False
         self.O2 = np.array([])
         self.Vblank = 0
         self.reagO2 = 7.6e-8; # concentration of O2 dissolved in reagents
@@ -287,10 +289,8 @@ class titration():
             elif vol_to_end <= -30:
                 return False
 
-    def toJSON(self,extra_attributes:dict = None):
-        if extra_attributes:
-            titr = extra_attributes
-        else:
+    def toJSON(self,titr:dict = None):
+        if titr==None:
             titr = {}
         attributes = ('botid','Mthios','vbot','Vblank','init_time','v_end',\
                       'end_time','endpoint','mode','type','thio_t','is_complete','comment')

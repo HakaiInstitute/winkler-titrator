@@ -21,7 +21,9 @@ root_dir = os.path.join(os.path.expanduser('~'),'winkler-titrator-hakai')
 config = configparser.ConfigParser()
 config.read(os.path.join(root_dir,'wink.ini'))
 Mthios = config['PUMP']['Mthios']
-# print('in address is :' + config['PUMP']['InAddr'])
+
+#print('in address is :' + config['PUMP']['InAddr'])
+
 logging.basicConfig(filename=os.path.join(root_dir,'log'+strftime("%Y%m%d", \
     gmtime())),level='INFO',format='%(levelname)s %(asctime)s %(message)s')
 logging.info('Im logging!')
@@ -244,12 +246,11 @@ class AppWindow(QMainWindow,winkler.Ui_MainWindow):
         if 'Port' in config['STD_PUMP'] and config['PUMP']['Port'] in device_list or config['PUMP']['Port']=='None':
             self.comboBox_standard.setCurrentText(config['STD_PUMP']['Port'])
 
-    def get_air_conditions(self):
+    def get_metadata_log(self):
         return {
-            'lab_air_temp_degc':self.doubleSpinBox_air_temp,
-            'lab_air_pressure_kpa': self.doubleSpinBox_air_pressure,
-            'lab_air_percent_humidity': self.doubleSpinBox_air_humidity
-            }
+            "kio3_temp": self.doubleSpinBox_kio3_temp.value(),
+            "id": self.lineEdit_id.text()
+        }
 
     def get_titration_type(self):
         if self.pushButton_sample_type.isChecked():
@@ -300,11 +301,12 @@ class AppWindow(QMainWindow,winkler.Ui_MainWindow):
     def titration_done(self):
         # QMessageBox.warning(self,'','titration complete: endpoint=' +  \
         #         str(self.titr.endpoint),QMessageBox.Ok)
-        lab_air_conditions = self.get_air_conditions()
+        extra_metadata = self.get_metadata_log()
+        print('\a')
         comment, ok =  QInputDialog.getText(self,'Titration completed', 'Titration completed: endpoint=' +  \
                 str(self.titr.endpoint) +'uL\nAdd a comment here:')
         self.titr.comment = comment
-        self.titr.toJSON(lab_air_conditions)
+        self.titr.toJSON(extra_metadata)
         self.titr.pump.fill()
 
     def dispense_standard_clicked(self):
